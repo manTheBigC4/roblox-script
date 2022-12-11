@@ -4,8 +4,8 @@ local UIS = game:GetService("UserInputService")
 local keybind = Enum.KeyCode.LeftControl
 local Config = {
     WindowName = "ss",
-	Color = Color3.fromRGB(255,128,64),
-	Keybind = Enum.KeyCode.H
+    Color = Color3.fromRGB(255,128,64),
+    Keybind = Enum.KeyCode.H
 }
 repeat wait() until game:IsLoaded() wait()
 game:GetService("Players").LocalPlayer.Idled:connect(function()
@@ -36,12 +36,57 @@ local Section2 = Tab1:CreateSection("")
 local Section3 = Tab2:CreateSection("Menu")
 local Section4 = Tab2:CreateSection("Background")
 
+local plrservice = game:GetService("Players")
 
-local Toggle1 = Section1:CreateToggle("IFrame",nil,function (state)
+local data = {}
+data.tptarget = nil
+data.npcs = {}
+
+
+function storenpcs()
+    for i, v in next, workspace:GetChildren() do
+        if v.ClassName == "Model" and v:FindFirstChild("Humanoid") and not data.npcs[v.Name] and not plrservice:FindFirstChild(v.Name) and not game:GetService("ReplicatedStorage"):FindFirstChild(v.Name) then
+            print(v.Name.." Stored in ".."data.npcs")
+            data.npcs[v.Name] = v
+            print(data.npcs[v.Name])
+            local args = {
+                [1] = "placeobject",
+                [2] = {
+                    [1] = v,
+                    [2] = game:GetService("ReplicatedStorage")
+                }
+            }
+            
+            game:GetService("Players").LocalPlayer.Backpack.BuildTool.RemoteFunction:InvokeServer(unpack(args))        
+        end
+    end
+end
+
+spawn(function()
+    while true do
+        pcall(function()storenpcs()end)
+        wait()
+    end
+end)
+
+
+local tp = Section1:CreateTextBox("Tp Target","",false,function (p1)
+    local tar = string.lower(p1)
+    for i, v in next, plrservice:GetChildren() do
+        local wtf = string.lower(v.Name)
+        if  wtf == tar then
+            data.tptarget = v
+        else
+            warn("Player Not Valid")
+        end
+    end
+end)
+
+local Toggle1 = Section1:CreateToggle("TP to Target",nil,function (state)
     getgenv().toggle = state
     while toggle do
         local plr = game:GetService("Players")
-        plr.LocalPlayer.Character.HumanoidRootPart.CFrame = plr:FindFirstChild("LoucasTitan").Character.HumanoidRootPart.CFrame
+        plr.LocalPlayer.Character.HumanoidRootPart.CFrame = data.tptarget.Character.HumanoidRootPart.CFrame
         wait()
     end
 end)
@@ -100,7 +145,7 @@ local Toggle4 = Section1:CreateToggle("Kill Others",nil,function (state)
 
             for i, v in next, workspace:GetChildren() do
 
-                if v.ClassName == "Model" and v:FindFirstChild("Humanoid") and v.Name ~= "UnrealDirt" and v.Name ~= "LoucasTitan" then
+                if v.ClassName == "Model" and v:FindFirstChild("Humanoid") and v.Name ~= "UnrealDirt" and v.Name ~= "LoucasTitan" and v.Name ~= plrservice.LocalPlayer.Name then
 
                     local args = {
                         [1] = "hit",
@@ -110,7 +155,7 @@ local Toggle4 = Section1:CreateToggle("Kill Others",nil,function (state)
                         }
                     }
 
-                    game:GetService("Players").LocalPlayer.Character:FindFirstChild("Ice Hammer").RemoteFunction:InvokeServer(unpack(args))
+                    game:GetService("Players").LocalPlayer.Character:FindFirstChild("Sword").RemoteFunction:InvokeServer(unpack(args))
 
                 end
 
@@ -145,10 +190,10 @@ local blacktoggle = Section1:CreateToggle("Pull Player(id 169)",nil,function (st
             }
 
             game:GetService("Players").LocalPlayer.Character:FindFirstChild("Blackhole Staff").RemoteFunction:InvokeServer(unpack(args))
-      
+    
 
         end)
-   
+
     else
         getgenv().rsbh:Disconnect()
     end
@@ -166,57 +211,223 @@ local Textbox1 = Section1:CreateTextBox("Give Tool","ID(Must be a Number)",true,
     game:GetService("ReplicatedStorage").MainControl:InvokeServer(unpack(args))    
 end)
 
-local rs = game:GetService("RunService")
+local mobratetext = Section1:CreateTextBox("Increase Mob Rate","Must be A number(don't put too much)",true,function(num)
+    if type(tonumber(num)) ~= "number" then print("Not A NUMBER") return end
+    local Bases = workspace.Bases
+   
+    local rate = tonumber(num)
+    local plrbase = nil
+    for i, v in next, Bases:GetChildren() do
+        for i2,v2 in next, v:GetChildren() do
 
-rs.RenderStepped:Connect(function()
-    for i, v in next, game.ReplicatedStorage.Items:GetChildren() do
-    
+            if v2.ClassName == "ObjectValue" and tostring(v2.Value) == game.Players.LocalPlayer.Name then
+                plrbase = v
+            end
+
+        end
+    end
+    print(plrbase.Name)
+
+    for i = 1,rate do 
+        
+        if not plrbase.objects:FindFirstChild("wall") then
+            local args = {
+                [1] = "placeobject",
+                [2] = {
+                    [1] = game:GetService("ReplicatedStorage").Blocks.wall,
+                    [2] = plrbase.objects,
+                    [3] = plrbase.objects.center.CFrame * CFrame.new(0,3.5,0),
+                    [4] = 0
+                }
+            }
+            
+            game:GetService("Players").LocalPlayer.Backpack.BuildTool.RemoteFunction:InvokeServer(unpack(args))
+        end
+
         local args = {
             [1] = "placeobject",
             [2] = {
-                [1] = v.Tool,
-                [2] = game.Players.Bobytoeburrito.Character,
-                [3] = nil,
-                [4] = nil
+                [1] = workspace.Landscape.enemySpawn,
+                [2] = plrbase.objects.wall
+            }
+        }
+        
+        game:GetService("Players").LocalPlayer.Backpack.BuildTool.RemoteFunction:InvokeServer(unpack(args))
+        
+    end
+end)
+
+local removemobrate = Section1:CreateButton("Reset Mob Rate",function ()
+    local Bases = workspace.Bases
+    local plrbase = nil
+    for i, v in next, Bases:GetChildren() do
+        for i2,v2 in next, v:GetChildren() do
+
+            if v2.ClassName == "ObjectValue" and tostring(v2.Value) == game.Players.LocalPlayer.Name then
+                plrbase = v
+            end
+
+        end
+    end
+    
+    while plrbase.objects:FindFirstChild("wall") do
+        local args = {
+            [1] = "removeobject",
+            [2] = {
+                [1] = plrbase.objects.wall,
+                [2] = plrbase,
+                
             }
         }
 
-        game:GetService("Players").LocalPlayer.Backpack.BuildTool.RemoteFunction:InvokeServer(unpack(args))
+        game:GetService("Players").LocalPlayer.Backpack.RemoveTool.RemoteFunction:InvokeServer(unpack(args))
+
+        wait()
     end
+
 end)
 
-
-getgenv().npcstorage = {}
-local Zombie = workspace.Zombie
-local helios = workspace.helios
-local yes = game:GetService("ReplicatedStorage").Items.OmegaDeathScythe.Tool
-table.insert(npcstorage,Zombie)
-table.insert(npcstorage,helios)
-local args = {
-    [1] = "placeobject",
-    [2] = {
-        [1] = npcstorage[2],
-        [2] = workspace,
-        [3] = nil,
-        [4] = nil
-    }
-}
-
-game:GetService("Players").LocalPlayer.Backpack.BuildTool.RemoteFunction:InvokeServer(unpack(args))
-for i, v in next, getgenv() do
-    print(i,v)
-end
-
-local rs = game:GetService("RunService")
-getgenv().i = rs.RenderStepped:Connect(function()
-    for i, v in next, game.Workspace:GetChildren() do
-        if v.ClassName == "Model" and v:FindFirstChild("Humanoid") and v.Name ~= game.Players.LocalPlayer.Name then
-            local args = {
-                [1] = "inserteffect",
-                [2] = v
-            }
-
-            game:GetService("Players").LocalPlayer.Character:FindFirstChild("Medusa Head").RemoteFunction:InvokeServer(unpack(args))
+local show = Section1:CreateButton("Check Spawnable Npcs",function()
+    for i, v in next, data.npcs do
+        print(i,v)
+    end
+    for i, v in next, game:GetService("ReplicatedStorage"):GetChildren() do
+        if v.ClassName == "Model" and v:FindFirstChild("Humanoid") then
+            print(i,v)
         end
     end
+
 end)
+
+local spawnmob = Section1:CreateTextBox("Spawn Mob","Mob Name",false,function(mob)
+    local splitted = mob:split(" ")
+    local plrbase = nil
+    for i, v in next, workspace.Bases:GetChildren() do
+        for i2,v2 in next, v:GetChildren() do
+
+            if v2.ClassName == "ObjectValue" and tostring(v2.Value) == game.Players.LocalPlayer.Name then
+                plrbase = v
+            end
+
+        end
+    end
+    print(plrbase.Name)
+    if not plrbase.objects:FindFirstChild("fridge") then
+        local args = {
+            [1] = "placeobject",
+            [2] = {
+                [1] = game:GetService("ReplicatedStorage").Blocks.fridge,
+                [2] = plrbase.objects,
+                [3] = plrbase.objects.center.CFrame * CFrame.new(0,3.5,0),
+                [4] = 0
+            }
+        }
+        
+        game:GetService("Players").LocalPlayer.Backpack.BuildTool.RemoteFunction:InvokeServer(unpack(args))
+    end
+
+    if #splitted == 2 then
+        for i = 1,tonumber(splitted[2]) do 
+            local args = {
+                [1] = "placeobject",
+                [2] = {
+                    [1] = game:GetService("ReplicatedStorage"):FindFirstChild(splitted[1]),
+                    [2] = plrbase.objects.fridge
+                }
+            }
+            
+            game:GetService("Players").LocalPlayer.Backpack.BuildTool.RemoteFunction:InvokeServer(unpack(args))
+        end
+    elseif #splitted == 3 then
+        local limit = tonumber(table.remove(splitted))
+        print(splitted[1].." "..splitted[2])
+        for i = 1, limit do 
+            local args = {
+                [1] = "placeobject",
+                [2] = {
+                    [1] = game:GetService("ReplicatedStorage"):FindFirstChild(splitted[1].." "..splitted[2]),
+                    [2] = plrbase.objects.fridge
+                }
+            }
+            
+            game:GetService("Players").LocalPlayer.Backpack.BuildTool.RemoteFunction:InvokeServer(unpack(args))
+        end
+    elseif #splitted == 4 then 
+        local limit = tonumber(table.remove(splitted))
+        for i = 1,limit do 
+            local args = {
+                [1] = "placeobject",
+                [2] = {
+                    [1] = game:GetService("ReplicatedStorage"):FindFirstChild(splitted[1].." "..splitted[2].." "..splitted[3]),
+                    [2] = plrbase.objects.fridge
+                }
+            }
+            
+            game:GetService("Players").LocalPlayer.Backpack.BuildTool.RemoteFunction:InvokeServer(unpack(args))
+        end
+    end
+
+end)
+
+local rem = Section1:CreateButton("Remove all Spawned Mobs",function ()
+    local Bases = workspace.Bases
+    local plrbase = nil
+    
+    for i, v in next, Bases:GetChildren() do
+        for i2,v2 in next, v:GetChildren() do
+
+            if v2.ClassName == "ObjectValue" and tostring(v2.Value) == game.Players.LocalPlayer.Name then
+                plrbase = v
+            end
+
+        end
+    end
+    
+    while plrbase.objects:FindFirstChild("fridge") do
+        local args = {
+            [1] = "removeobject",
+            [2] = {
+                [1] = plrbase.objects.fridge,
+                [2] = plrbase,
+                
+            }
+        }
+
+        game:GetService("Players").LocalPlayer.Backpack.RemoveTool.RemoteFunction:InvokeServer(unpack(args))
+
+        wait()
+    end
+end)
+
+local f = Section2:CreateButton("Check Plr Base",function ()
+    local plrbase = nil
+    local Bases = workspace.Bases
+    for i, v in next, Bases:GetChildren() do
+        for i2,v2 in next, v:GetChildren() do
+
+            if v2.ClassName == "ObjectValue" and tostring(v2.Value) == game.Players.LocalPlayer.Name then
+                plrbase = v
+            end
+
+        end
+    end
+    print(plrbase.Name)
+end)
+
+local f = Section2:CreateButton("Op Scythe",function()
+    for i, v in next, game:GetService("Players"):GetChildren() do
+        for i = 1,10 do
+            local args = {
+                [1] = "placeobject",
+                [2] = {
+                    [1] = game:GetService("ReplicatedStorage").Items:FindFirstChild("OmegaDeathScythe").Tool,
+                    [2] = v.Character
+                }
+            }
+            
+            game:GetService("Players").LocalPlayer.Backpack.BuildTool.RemoteFunction:InvokeServer(unpack(args))
+        end
+    end
+
+end)
+
