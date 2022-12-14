@@ -1,3 +1,5 @@
+--if getgenv().Window ~= nil then getgenv().Window:Destroy() getgenv() = {} end
+
 getgenv().debounce = true
 local rs = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
@@ -446,4 +448,68 @@ local cras = Section2:CreateButton("Server Crash", function()
         
         game:GetService("Players").LocalPlayer.Backpack.BuildTool.RemoteFunction:InvokeServer(unpack(args))
     end)
+end)
+
+local spawnrateore = Section2:CreateTextBox("Ore spawnrate","",false,function (name)
+    local Bases = workspace.Bases
+    local repstor = game:GetService("ReplicatedStorage")
+    local blocks = repstor.Blocks
+    local plrbase = nil
+    for i, v in next, Bases:GetChildren() do
+        for i2,v2 in next, v:GetChildren() do
+
+            if v2.ClassName == "ObjectValue" and tostring(v2.Value) == game.Players.LocalPlayer.Name then
+                plrbase = v
+            end
+
+        end
+    end
+
+
+    if not plrbase.objects:FindFirstChild("lamp") then
+        local args = {
+            [1] = "placeobject",
+            [2] = {
+                [1] = blocks:FindFirstChild("lamp"),
+                [2] = plrbase.objects
+            }
+        }
+        
+        game:GetService("Players").LocalPlayer.Backpack.BuildTool.RemoteFunction:InvokeServer(unpack(args))
+    end    
+
+    local splitted = name:split(" ")
+    local var = tonumber(splitted[2])
+
+    for i = 1,var do 
+        local args = {
+            [1] = "placeobject",
+            [2] = {
+                [1] = workspace:FindFirstChild(splitted[1]).oreSpawn,
+                [2] = plrbase.objects.lamp
+            }
+        }
+        
+        game:GetService("Players").LocalPlayer.Backpack.BuildTool.RemoteFunction:InvokeServer(unpack(args))
+    end
+
+end)
+
+local destroyspawnrateore = Section2:CreateButton("Remove ore Spawnrate",function ()
+    local plrbase = nil
+    local Bases = workspace.Bases
+    
+    for i, v in next, Bases:GetChildren() do
+        for i2,v2 in next, v:GetChildren() do
+
+            if v2.ClassName == "ObjectValue" and tostring(v2.Value) == game.Players.LocalPlayer.Name then
+                plrbase = v
+            end
+
+        end
+    end
+
+    while plrbase.objects:FindFirstChild("lamp") do
+        plrbase.objects:FindFirstChild("lamp"):Destroy()
+    end
 end)
