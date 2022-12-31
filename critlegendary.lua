@@ -238,4 +238,3 @@ local autorefill = Section2:CreateToggle("Auto refill mana pot",nil,function(sta
     end
 end)
 
-game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(49.0098686, 34.9999886, -75.8938141, 0.970981956, 5.64069147e-08, -0.239152849, -5.39365637e-08, 1, 1.68740968e-08, 0.239152849, -3.48536111e-09, 0.970981956)
