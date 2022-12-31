@@ -174,12 +174,7 @@ local infregenstat = Section1:CreateToggle("Inf regen(Mana scroll or mini tree)"
                 wait()
             end
         end)
-        local args = {
-            [1] = "SetupItem",
-            [2] = "Mana Scroll"
-        }
-    
-        game:GetService("ReplicatedStorage").Server:FireServer(unpack(args))
+      
     else
         g:Disconnect()
     end
@@ -218,14 +213,28 @@ local autorefill = Section2:CreateToggle("Auto refill mana pot",nil,function(sta
         if not workspace:FindFirstChild("CombatFolder") and de == true then
             local prevloc = plr.Character.HumanoidRootPart.CFrame
             plr.Character.HumanoidRootPart.CFrame = CFrame.new(49.0098686, 34.9999886, -75.8938141, 0.970981956, 5.64069147e-08, -0.239152849, -5.39365637e-08, 1, 1.68740968e-08, 0.239152849, -3.48536111e-09, 0.970981956)
-            task.wait(2)
+            local items = {}
+            for i = 1,3 do 
+                items[game:GetService("Players")["Chelly_Hell"].PlayerData.Equipped["Active"..tostring(i)]] = game:GetService("Players")["Chelly_Hell"].PlayerData.Equipped["Active"..tostring(i)].Value 
+            end
 
             local args = {
-                [1] = "SetupItem",
-                [2] = "Mana Potion"
+                [1] = "ClearActive"
             }
 
             game:GetService("ReplicatedStorage").Server:FireServer(unpack(args))
+
+            task.wait(2)
+            for i, v in next, items do
+                local args = {
+                    [1] = "SetupItem",
+                    [2] = tostring(v)
+                }
+    
+                game:GetService("ReplicatedStorage").Server:FireServer(unpack(args))
+            end
+           
+
             task.wait(3)
             plr.Character.HumanoidRootPart.CFrame = prevloc
             de = false
