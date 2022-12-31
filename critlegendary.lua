@@ -247,7 +247,7 @@ local autorefill = Section2:CreateToggle("Auto refill mana pot",nil,function(sta
     end
 end)
 
-local 5milgold = Section2:CreateButton("Get 5 mil gold quest lmfao",function ()
+local milgold = Section2:CreateButton("Get 5 mil gold quest lmfao",function ()
     if plr.PlayerData.Quests:FindFirstChild("Foxes and Slimes") then return end
     local prevloc = plr.Character.HumanoidRootPart.CFrame
     plr.Character.HumanoidRootPart.CFrame = game:GetService("Workspace").QuestNPCs["Foxes and Slimes"].Main.CFrame
