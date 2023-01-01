@@ -29,7 +29,7 @@ UIS.InputBegan:Connect(function (input,bool)
 end)
 
 local Tab1 = getgenv().Window:CreateTab("Crit Legendary")
-
+getgenv().datagame = {}
 
 local Section1 = Tab1:CreateSection("Test")
 local Section2 = Tab1:CreateSection("")
@@ -263,4 +263,42 @@ local milgold = Section2:CreateButton("Get 5 mil gold quest lmfao",function ()
     workspace.QuestNPCs.Main.onClick:FireServer(unpack(args))
 
     plr.Character.HumanoidRootPart.CFrame = prevloc
+end)
+
+local printallzones = Section2:CreateButton("print all zones(check f9)",function()
+    for i, v in next, workspace.Enemies:GetChildren() do 
+        print(v.Name)
+    end
+end)
+
+
+local farmzones = Section2:CreateTextBox("Input zones","",nil,function(p1)
+    if not workspace.Enemies:FindFirstChild(p1) then warn("zone doesnt exist") end
+    datagame.zone = p1
+    print(datagame.zone)
+end)
+
+local autotptoenemies = Section2:CreateToggle("Auto tp to enemies in selected zone",nil,function(state)
+    getgenv().epw = state
+    while epw do
+        if workspace.Enemies:FindFirstChild(datagame.zone) then
+
+            for i, v in next, workspace.Enemies:FindFirstChild(datagame.zone):GetChildren() do 
+                
+                if v.ClassName == "Model" and not v:FindFirstChild("Pack") then
+                    plr.Character.HumanoidRootPart.CFrame = v.EnemyLocation.CFrame
+                    repeat wait() until v:FindFirstChild("EnemyDefeat")
+                    local part = Instance.new("NumberValue",v) 
+                    part.Name = "Pack"
+                    game:GetService("Debris"):AddItem(part,5) 
+                    wait(1)
+                end
+                
+            end
+
+        end
+        wait(1)
+    end
+        
+  
 end)
