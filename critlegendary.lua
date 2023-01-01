@@ -215,7 +215,7 @@ local autorefill = Section2:CreateToggle("Auto refill mana pot",nil,function(sta
             plr.Character.HumanoidRootPart.CFrame = CFrame.new(49.0098686, 34.9999886, -75.8938141, 0.970981956, 5.64069147e-08, -0.239152849, -5.39365637e-08, 1, 1.68740968e-08, 0.239152849, -3.48536111e-09, 0.970981956)
             local items = {}
             for i = 1,3 do 
-                items[game:GetService("Players")["Chelly_Hell"].PlayerData.Equipped["Active"..tostring(i)]] = game:GetService("Players")["Chelly_Hell"].PlayerData.Equipped["Active"..tostring(i)].Value 
+                items[game:GetService("Players").LocalPlayer.PlayerData.Equipped["Active"..tostring(i)]] = game:GetService("Players").LocalPlayer.PlayerData.Equipped["Active"..tostring(i)].Value 
             end
 
             local args = {
