@@ -253,5 +253,14 @@ local milgold = Section2:CreateButton("Get 5 mil gold quest lmfao",function ()
     plr.Character.HumanoidRootPart.CFrame = game:GetService("Workspace").QuestNPCs["Foxes and Slimes"].Main.CFrame
     wait(1.2)
     fireproximityprompt(game:GetService("Workspace").QuestNPCs["Foxes and Slimes"].Main.ProximityPrompt,5)
+
+
+    local args = {
+        [1] = "MainAction",
+        [2] = workspace.QuestNPCs:FindFirstChild("Foxes and Slimes")
+    }
+
+    workspace.QuestNPCs.Main.onClick:FireServer(unpack(args))
+
     plr.Character.HumanoidRootPart.CFrame = prevloc
 end)
