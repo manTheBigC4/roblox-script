@@ -210,7 +210,7 @@ local autorefill = Section2:CreateToggle("Auto refill mana pot",nil,function(sta
     getgenv().refill = state
     getgenv().de = state
     while refill do
-        if not workspace:FindFirstChild("CombatFolder") and de == true then
+        if not workspace:FindFirstChild("CombatFolder") and de == true and plr.Character:FindFirstChild("Humanoid") then
             local prevloc = plr.Character.HumanoidRootPart.CFrame
             plr.Character.HumanoidRootPart.CFrame = CFrame.new(49.0098686, 34.9999886, -75.8938141, 0.970981956, 5.64069147e-08, -0.239152849, -5.39365637e-08, 1, 1.68740968e-08, 0.239152849, -3.48536111e-09, 0.970981956)
             local items = {}
@@ -299,6 +299,11 @@ local autotptoenemies = Section2:CreateToggle("Auto tp to enemies in selected zo
         end
         wait(1)
     end
-        
-  
 end)
+
+local enemytpd = Section2:CreateDropdown("Pick Enemies To Tp At")
+for i, v in next, workspace.Enemies:GetChildren() do
+    enemytpd:AddOption(v.Name,function()
+        plr.Character.HumanoidRootPart.CFrame = v.Enemy.EnemyLocation.CFrame
+    end)
+end
