@@ -307,3 +307,10 @@ for i, v in next, workspace.Enemies:GetChildren() do
         plr.Character.HumanoidRootPart.CFrame = v.Enemy.EnemyLocation.CFrame
     end)
 end
+
+local statues = Section2:CreateDropdown("Tp To Statues")
+for i, v in next,workspace.Statues:GetChildren() do
+    statues:AddOption(v.Name,function()
+        plr.Character.HumanoidRootPart.CFrame = v.Part.CFrame * CFrame.new(0,0,-4)
+    end)
+end
