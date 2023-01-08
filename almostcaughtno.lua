@@ -314,3 +314,15 @@ for i, v in next,workspace.Statues:GetChildren() do
         plr.Character.HumanoidRootPart.CFrame = v.Part.CFrame * CFrame.new(0,0,-4)
     end)
 end
+
+local checkinv = Section2:CreateDropdown("Check plr inventory")
+for i, v in next, game:GetService("Players"):GetChildren() do
+    checkinv:AddOption(v.Name,function()
+        warn(string.rep("-",400))
+        print(v.Name, string.rep("-",80).."[[[[")
+        for i2, v2 in next, v.PlayerData.Inventory:GetChildren() do
+            print(v2.Name,v2.Value)
+        end
+        print(v.Name,"]]]]"..string.rep("-",80))
+    end)
+end
