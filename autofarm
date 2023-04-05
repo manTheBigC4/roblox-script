@@ -1,0 +1,81 @@
+local uilib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kiet1308/tvkhub/main/rac"))()
+
+local window = uilib:CreateWindow("CL","CL",false)
+local page1 = window:CreatePage("AutoFarm")
+
+local section1 = page1:CreateSection("AutoFarm")
+local section2 = page1:CreateSection("Autofarm2")
+
+local rs = game:GetService("RunService")
+local plr = game:GetService("Players").LocalPlayer
+local debris = game:GetService("Debris")
+
+getgenv().debounce = false
+getgenv().values = {} or getgenv().values
+
+local fields = {}
+for i, v in next, game:GetService("Workspace").Enemies:GetChildren() do
+    table.insert(fields, v.Name)
+end
+
+
+local function orbs()
+    if workspace:FindFirstChild("CombatFolder") then
+        local cfolder = workspace:FindFirstChild("CombatFolder")
+        for i, v in next, cfolder[plr.Name]:GetChildren() do
+            plr.Character.HumanoidRootPart.CFrame = v:FindFirstChild("Base").CFrame
+        end
+    end
+end
+
+
+
+
+section1:CreateDropdown("Select field",{List = fields,Default = "None"},function(value)
+    print(value.." Has been selected!")
+    values["f"] = value
+end)
+
+
+section1:CreateToggle("Autofarm", {Toggled = false, Description = false}, function(s)
+    if s and values["f"] ~= "None" then
+
+        getgenv().autos = rs.RenderStepped:Connect(function()
+            for i, v in next, workspace.Enemies[values["f"]]:GetChildren() do 
+                
+                if v.Name == "Enemy" and not v:FindFirstChild("Passed") and not v:FindFirstChild("EnemyDefeat") and getgenv().debounce == false then 
+                    getgenv().debounce = true
+                    plr.Character.HumanoidRootPart.CFrame = v.EnemyLocation.CFrame
+                    local dog = Instance.new("Part",v)
+                    dog.Name = "Passed"
+                    debris:AddItem(dog,10)
+                    repeat 
+                        orbs()
+                        wait()
+                    until v:FindFirstChild("EnemyDefeat")
+                    getgenv().debounce = false
+                end
+            end
+
+        end)
+    else
+        autos:Disconnect()
+    end 
+end)
+
+
+section1:CreateButton("Godmode",function()
+    local mt = getrawmetatable(game)
+    setreadonly(mt,false)
+    local oldnc = mt.__namecall
+
+    mt.__namecall = newcclosure(function(self,...)
+        local args = {...}
+        if self.ClassName == "RemoteEvent" and self.Name == "DamageNew" and not checkcaller() and args[3] == "Enemy" then
+            return nil
+        end
+        return oldnc(self,...)
+    end)
+
+end)
+
