@@ -1,5 +1,6 @@
 local uilib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kiet1308/tvkhub/main/rac"))()
 
+
 local window = uilib:CreateWindow("CL","CL",false)
 local page1 = window:CreatePage("AutoFarm")
 
@@ -8,7 +9,16 @@ local section2 = page1:CreateSection("Autofarm2")
 
 local rs = game:GetService("RunService")
 local plr = game:GetService("Players").LocalPlayer
+local UIS = game:GetService("UserInputService")
 local debris = game:GetService("Debris")
+
+UIS.InputBegan:Connect(function(input,bools)
+    if bools == true then return end
+    if input.KeyCode == Enum.KeyCode.LeftControl then
+        uilib:ToggleUI()
+    end
+
+end)
 
 getgenv().debounce = false
 getgenv().values = {} or getgenv().values
@@ -24,6 +34,7 @@ local function orbs()
         local cfolder = workspace:FindFirstChild("CombatFolder")
         for i, v in next, cfolder[plr.Name]:GetChildren() do
             plr.Character.HumanoidRootPart.CFrame = v:FindFirstChild("Base").CFrame
+            uilib:ToggleUI()
         end
     end
 end
@@ -43,6 +54,7 @@ section1:CreateToggle("Autofarm", {Toggled = false, Description = false}, functi
 
         getgenv().autos = rs.RenderStepped:Connect(function()
             for i, v in next, workspace.Enemies[values["f"]]:GetChildren() do 
+                
                 if values["s"] == false then break end
                 if v.Name == "Enemy" and not v:FindFirstChild("Passed") and not v:FindFirstChild("EnemyDefeat") and getgenv().debounce == false then 
                     getgenv().debounce = true
