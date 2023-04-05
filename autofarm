@@ -38,11 +38,12 @@ end)
 
 
 section1:CreateToggle("Autofarm", {Toggled = false, Description = false}, function(s)
+    values["s"] = s
     if s and values["f"] ~= "None" then
 
         getgenv().autos = rs.RenderStepped:Connect(function()
             for i, v in next, workspace.Enemies[values["f"]]:GetChildren() do 
-                
+                if values["s"] == false then break end
                 if v.Name == "Enemy" and not v:FindFirstChild("Passed") and not v:FindFirstChild("EnemyDefeat") and getgenv().debounce == false then 
                     getgenv().debounce = true
                     plr.Character.HumanoidRootPart.CFrame = v.EnemyLocation.CFrame
