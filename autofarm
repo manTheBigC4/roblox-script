@@ -2,10 +2,10 @@ local uilib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kiet130
 
 
 local window = uilib:CreateWindow("CL","CL",false)
-local page1 = window:CreatePage("AutoFarm")
+local page1 = window:CreatePage("General")
 
-local section1 = page1:CreateSection("AutoFarm")
-local section2 = page1:CreateSection("Autofarm2")
+local section1 = page1:CreateSection("Autofarm")
+local section2 = page1:CreateSection("Teleport")
 
 local rs = game:GetService("RunService")
 local plr = game:GetService("Players").LocalPlayer
@@ -28,13 +28,26 @@ for i, v in next, game:GetService("Workspace").Enemies:GetChildren() do
     table.insert(fields, v.Name)
 end
 
+local plrstable = {}
+for i, v in next, game:GetService("Players"):GetChildren() do
+    table.insert(plrstable,v.Name)
+end
+
+local Statuestable = {}
+for i, v in next, workspace.Statues:GetChildren() do
+    table.insert(Statuestable,v.Name)
+end
+
+
+
+
+
 
 local function orbs()
     if workspace:FindFirstChild("CombatFolder") then
         local cfolder = workspace:FindFirstChild("CombatFolder")
         for i, v in next, cfolder[plr.Name]:GetChildren() do
             plr.Character.HumanoidRootPart.CFrame = v:FindFirstChild("Base").CFrame
-            uilib:ToggleUI()
         end
     end
 end
@@ -77,18 +90,34 @@ section1:CreateToggle("Autofarm", {Toggled = false, Description = false}, functi
 end)
 
 
-section1:CreateButton("Godmode",function()
-    local mt = getrawmetatable(game)
-    setreadonly(mt,false)
-    local oldnc = mt.__namecall
-
-    mt.__namecall = newcclosure(function(self,...)
-        local args = {...}
-        if self.ClassName == "RemoteEvent" and self.Name == "DamageNew" and not checkcaller() and args[3] == "Enemy" then
-            return nil
-        end
-        return oldnc(self,...)
-    end)
-
+local haha = section2:CreateDropdown("Teleport to player",{List = plrstable,Default = ""},function(value)
+    if game:GetService("Players"):FindFirstChild(value) then
+          plr.Character.HumanoidRootPart.CFrame = game:GetService("Players"):FindFirstChild(value).Character.HumanoidRootPart.CFrame
+    end
+  
 end)
+
+game:GetService("Players").ChildAdded:Connect(function(child)
+    table.insert(plrstable,child.Name)
+    print(child.Name.." has Been added!")
+    haha:Clear()
+    haha:Add(plrstable)
+end)
+
+game:GetService("Players").ChildRemoved:Connect(function(child)
+    table.remove(plrstable,table.find(plrstable,child.Name))
+    print(child.Name.." has been removed!")
+    haha:Clear()
+    haha:Add(plrstable)
+end)
+
+
+section2:CreateDropdown("Teleport to Statues",{List = Statuestable,Default = "None"},function(value)
+    if workspace.Statues:FindFirstChild(value) then
+        local sta = workspace.Statues:FindFirstChild(value)
+        plr.Character.HumanoidRootPart.CFrame = sta:FindFirstChild("Part").CFrame * CFrame.new(0,10,0)
+    end 
+end)
+
+
 
