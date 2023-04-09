@@ -20,8 +20,9 @@ UIS.InputBegan:Connect(function(input,bools)
 
 end)
 
+getgenv().deathtrigger = false
 getgenv().debounce = false
-getgenv().values = {} or getgenv().values
+getgenv().values = getgenv().values or {}
 
 local fields = {}
 for i, v in next, game:GetService("Workspace").Enemies:GetChildren() do
@@ -38,16 +39,23 @@ for i, v in next, workspace.Statues:GetChildren() do
     table.insert(Statuestable,v.Name)
 end
 
-
-
+plr.Character.Humanoid.Died:Connect(function()
+    deathtrigger = true
+    print(deathtrigger)
+end)
+plr.CharacterAdded:Connect(function()
+    deathtrigger = false
+    print(deathtrigger)
+end)
 
 
 
 local function orbs()
-    if workspace:FindFirstChild("CombatFolder") then
+    if workspace:FindFirstChild("CombatFolder") and deathtrigger == false then
         local cfolder = workspace:FindFirstChild("CombatFolder")
         for i, v in next, cfolder[plr.Name]:GetChildren() do
             plr.Character.HumanoidRootPart.CFrame = v:FindFirstChild("Base").CFrame
+            wait()
         end
     end
 end
@@ -62,31 +70,75 @@ end)
 
 
 section1:CreateToggle("Autofarm", {Toggled = false, Description = false}, function(s)
-    values["s"] = s
-    if s and values["f"] ~= "None" then
+    values["tau"] = s 
 
-        getgenv().autos = rs.RenderStepped:Connect(function()
-            for i, v in next, workspace.Enemies[values["f"]]:GetChildren() do 
-                
-                if values["s"] == false then break end
-                if v.Name == "Enemy" and not v:FindFirstChild("Passed") and not v:FindFirstChild("EnemyDefeat") and getgenv().debounce == false then 
-                    getgenv().debounce = true
+    while values["tau"] == true do
+        print("Huhbefore")
+        if getgenv().deathtrigger == false and not workspace:FindFirstChild("CombatFolder") then 
+            print("huh")
+            for i, v in next, workspace.Enemies[values["f"]]:GetChildren() do
+                if values["tau"] == false then break end
+                repeat wait() until deathtrigger == false
+                print("new loop")
+                wait(3)
+                if v.ClassName == "Model" and not v:FindFirstChild("passed") and deathtrigger == false then
                     plr.Character.HumanoidRootPart.CFrame = v.EnemyLocation.CFrame
-                    local dog = Instance.new("Part",v)
-                    dog.Name = "Passed"
-                    debris:AddItem(dog,10)
-                    repeat 
-                        orbs()
-                        wait()
-                    until v:FindFirstChild("EnemyDefeat")
-                    getgenv().debounce = false
+                    local xd = Instance.new("Part",v)
+                    xd.Name = "passed"
+                    debris:AddItem(xd,10)
+                    repeat orbs() print("ongoing") wait() until v:FindFirstChild("EnemyDefeat") or deathtrigger == true or not workspace:FindFirstChild("CombatFolder")
+                    print("end of loop")
+                
                 end
+
+                wait()
             end
 
-        end)
-    else
-        autos:Disconnect()
-    end 
+        end
+        wait()
+    end
+end)
+
+
+section1:CreateToggle("Auto use slots 2 and 1",{Toggled = false,Description=false},function(oorah)
+    getgenv().values["ora"] = oorah 
+
+
+
+    spawn(function()
+        while values["ora"] == true do
+            if not plr:FindFirstChild("Jingle_Bells_CD") then 
+                local args = {
+                    [1] = "UseItem",
+                    [2] = 2,
+                    [3] = {
+                        ["MouseHit"] = Vector3.new(1.7714271545410156, 36, -166.23452758789062)
+                    }
+                }
+
+                game:GetService("ReplicatedStorage").Server:FireServer(unpack(args))
+            end
+            wait()
+        end
+    end)   
+    spawn(function()
+        while values["ora"] == true do  
+            if plr:FindFirstChild("Jingle_Bells_CD") then
+                local args = {
+                    [1] = "UseItem",
+                    [2] = 1,
+                    [3] = {
+                        ["MouseHit"] = Vector3.new(1.7714271545410156, 36, -166.23452758789062)
+                    }
+                }
+
+                game:GetService("ReplicatedStorage").Server:FireServer(unpack(args))
+            end
+            wait()
+        end
+
+    end)
+
 end)
 
 
