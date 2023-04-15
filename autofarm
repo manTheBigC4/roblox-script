@@ -99,19 +99,6 @@ section1:CreateToggle("Autofarm", {Toggled = false, Description = false}, functi
     end
 end)
 
-section1:CreateButton("God Mode", function()
-
-    
-    local l 
-    l = hookmetamethod(game,"__namecall",function(self,...)
-        local args = {...}
-        if self.ClassName == "RemoteEvent" and args[3] == "Enemy" then
-            return nil 
-        end
-
-        return l(self,...)
-    end)
-end)
 
 
 section1:CreateToggle("Auto use slots 2 and 1",{Toggled = false,Description=false},function(oorah)
